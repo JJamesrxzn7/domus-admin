@@ -1,0 +1,316 @@
+﻿# MODEL SUMMARY
+Total tables found: 32
+
+### Table: unidad_medida (unidad_medida)
+  - id_unidad : SERIAL NOT NULL
+  - nombre : VARCHAR(20) NOT NULL
+  - simbolo : VARCHAR(10) NOT NULL
+  - factor_base : NUMERIC(14,6) NOT NULL
+  - tipo_magnitud : VARCHAR(10) NOT NULL
+
+### Table: categoria_item (categoria_item)
+  - id_categoria : SERIAL NOT NULL
+  - nombre : VARCHAR(60) NOT NULL
+  - tipo : VARCHAR(20) NOT NULL
+
+### Table: proveedor (proveedor)
+  - id_proveedor : SERIAL NOT NULL
+  - nombre : VARCHAR(120) NOT NULL
+  - contacto : VARCHAR(120) NULL
+  - telefono : VARCHAR(30) NULL
+  - email : VARCHAR(120) NULL
+  - activo : BOOLEAN NOT NULL
+
+### Table: tipo_movimiento (tipo_movimiento)
+  - id_tipo_movimiento : SERIAL NOT NULL
+  - nombre : VARCHAR(30) NOT NULL
+  - signo : SMALLINT NOT NULL
+  - afecta_stock : BOOLEAN NOT NULL
+
+### Table: cliente (cliente)
+  - id_cliente : SERIAL NOT NULL
+  - nombre : VARCHAR(120) NOT NULL
+  - telefono : VARCHAR(30) NULL
+  - email : VARCHAR(120) NULL
+
+### Table: mesa (mesa)
+  - id_mesa : SERIAL NOT NULL
+  - numero : VARCHAR(10) NOT NULL
+  - capacidad : INTEGER NOT NULL
+  - ubicacion : VARCHAR(60) NULL
+  - activa : BOOLEAN NOT NULL
+
+### Table: caja_sesion (caja_sesion)
+  - id_caja_sesion : SERIAL NOT NULL
+  - fecha_apertura : TIMESTAMP NOT NULL
+  - fecha_cierre : TIMESTAMP NULL
+  - monto_apertura : NUMERIC(12,2) NOT NULL
+  - monto_cierre : NUMERIC(12,2) NULL
+  - estado : VARCHAR(15) NOT NULL
+
+### Table: item (item)
+  - id_item : SERIAL NOT NULL
+  - nombre : VARCHAR(120) NOT NULL
+  - id_categoria : INTEGER NOT NULL
+  - tipo_item : VARCHAR(20) NOT NULL
+  - id_unidad_base : INTEGER NOT NULL
+  - maneja_lote : BOOLEAN NOT NULL
+  - perecedero : BOOLEAN NOT NULL
+  - vida_util_dias : INTEGER NULL
+  - politica_consumo : VARCHAR(10) NOT NULL
+  - stock_minimo : NUMERIC(14,4) NOT NULL
+  - activo : BOOLEAN NOT NULL
+
+### Table: item_proveedor (item_proveedor)
+  - id_item_proveedor : SERIAL NOT NULL
+  - id_item : INTEGER NOT NULL
+  - id_proveedor : INTEGER NOT NULL
+  - codigo_proveedor : VARCHAR(60) NULL
+  - precio_referencia : NUMERIC(12,4) NULL
+
+### Table: item_presentacion (item_presentacion)
+  - id_presentacion : SERIAL NOT NULL
+  - id_item : INTEGER NOT NULL
+  - nombre : VARCHAR(60) NOT NULL
+  - id_unidad : INTEGER NOT NULL
+  - factor_unidad : NUMERIC(14,6) NOT NULL
+  - es_venta : BOOLEAN NOT NULL
+  - es_compra : BOOLEAN NOT NULL
+
+### Table: receta (receta)
+  - id_receta : SERIAL NOT NULL
+  - id_item_resultante : INTEGER NOT NULL
+  - nombre : VARCHAR(120) NOT NULL
+  - tipo : VARCHAR(15) NOT NULL
+  - rendimiento : NUMERIC(14,4) NOT NULL
+  - id_unidad_rendimiento : INTEGER NOT NULL
+  - activa : BOOLEAN NOT NULL
+
+### Table: orden_compra (orden_compra)
+  - id_orden_compra : SERIAL NOT NULL
+  - id_proveedor : INTEGER NOT NULL
+  - fecha_emision : TIMESTAMP NOT NULL
+  - estado : VARCHAR(20) NOT NULL
+  - observaciones : TEXT NULL
+
+### Table: reserva (reserva)
+  - id_reserva : SERIAL NOT NULL
+  - id_cliente : INTEGER NOT NULL
+  - id_mesa : INTEGER NOT NULL
+  - fecha : DATE NOT NULL
+  - hora : TIME NOT NULL
+  - cantidad_comensales : INTEGER NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+  - observaciones : TEXT NULL
+
+### Table: precio_venta (precio_venta)
+  - id_precio : SERIAL NOT NULL
+  - id_presentacion : INTEGER NOT NULL
+  - precio : NUMERIC(12,2) NOT NULL
+  - vigente_desde : TIMESTAMP NOT NULL
+  - vigente_hasta : TIMESTAMP NULL
+
+### Table: receta_detalle (receta_detalle)
+  - id_receta_detalle : SERIAL NOT NULL
+  - id_receta : INTEGER NOT NULL
+  - id_item_insumo : INTEGER NOT NULL
+  - cantidad : NUMERIC(14,4) NOT NULL
+  - id_unidad : INTEGER NOT NULL
+  - merma_esperada_pct : NUMERIC(5,2) NOT NULL
+
+### Table: orden_compra_detalle (orden_compra_detalle)
+  - id_oc_detalle : SERIAL NOT NULL
+  - id_orden_compra : INTEGER NOT NULL
+  - id_item : INTEGER NOT NULL
+  - cantidad_solicitada : NUMERIC(14,4) NOT NULL
+  - id_unidad : INTEGER NOT NULL
+  - precio_pactado : NUMERIC(12,4) NOT NULL
+
+### Table: reserva_detalle (reserva_detalle)
+  - id_reserva_detalle : SERIAL NOT NULL
+  - id_reserva : INTEGER NOT NULL
+  - id_item : INTEGER NOT NULL
+  - cantidad : NUMERIC(14,4) NOT NULL
+  - observaciones : TEXT NULL
+
+### Table: recepcion (recepcion)
+  - id_recepcion : SERIAL NOT NULL
+  - id_orden_compra : INTEGER NOT NULL
+  - fecha_recepcion : TIMESTAMP NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+  - observaciones : TEXT NULL
+
+### Table: pedido (pedido)
+  - id_pedido : SERIAL NOT NULL
+  - id_reserva : INTEGER NULL
+  - fecha_hora : TIMESTAMP NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+  - observaciones : TEXT NULL
+
+### Table: orden_produccion (orden_produccion)
+  - id_orden_produccion : SERIAL NOT NULL
+  - id_receta : INTEGER NOT NULL
+  - tipo : VARCHAR(15) NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+  - fecha_planificada : TIMESTAMP NULL
+  - fecha_ejecucion : TIMESTAMP NULL
+  - rendimiento_real : NUMERIC(14,4) NULL
+  - observaciones : TEXT NULL
+
+### Table: recepcion_detalle (recepcion_detalle)
+  - id_recepcion_detalle : SERIAL NOT NULL
+  - id_recepcion : INTEGER NOT NULL
+  - id_oc_detalle : INTEGER NOT NULL
+  - cantidad_recibida : NUMERIC(14,4) NOT NULL
+  - id_unidad : INTEGER NOT NULL
+  - costo_real_unitario : NUMERIC(12,4) NOT NULL
+
+### Table: pedido_detalle (pedido_detalle)
+  - id_pedido_detalle : SERIAL NOT NULL
+  - id_pedido : INTEGER NOT NULL
+  - id_presentacion : INTEGER NOT NULL
+  - cantidad : NUMERIC(14,4) NOT NULL
+  - precio_unitario : NUMERIC(12,2) NOT NULL
+  - origen : VARCHAR(15) NOT NULL
+
+### Table: orden_produccion_detalle (orden_produccion_detalle)
+  - id_op_detalle : SERIAL NOT NULL
+  - id_orden_produccion : INTEGER NOT NULL
+  - id_item_insumo : INTEGER NOT NULL
+  - cantidad_teorica : NUMERIC(14,4) NOT NULL
+  - cantidad_real : NUMERIC(14,4) NULL
+  - id_unidad : INTEGER NOT NULL
+  - merma_asociada : NUMERIC(14,4) NOT NULL
+
+### Table: lote_inventario (lote_inventario)
+  - id_lote : SERIAL NOT NULL
+  - id_item : INTEGER NOT NULL
+  - codigo_lote : VARCHAR(60) NOT NULL
+  - origen : VARCHAR(15) NOT NULL
+  - id_recepcion_detalle : INTEGER NULL
+  - id_orden_produccion : INTEGER NULL
+  - fecha_ingreso : TIMESTAMP NOT NULL
+  - fecha_vencimiento : DATE NULL
+  - cantidad_inicial : NUMERIC(14,4) NOT NULL
+  - costo_unitario : NUMERIC(12,4) NOT NULL
+  - id_unidad : INTEGER NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+
+### Table: movimiento_inventario (movimiento_inventario)
+  - id_movimiento : BIGSERIAL NOT NULL
+  - id_item : INTEGER NOT NULL
+  - id_tipo_movimiento : INTEGER NOT NULL
+  - id_lote : INTEGER NULL
+  - cantidad : NUMERIC(14,4) NOT NULL
+  - id_unidad : INTEGER NOT NULL
+  - costo_unitario : NUMERIC(12,4) NOT NULL
+  - origen_tipo : VARCHAR(30) NOT NULL
+  - origen_id : BIGINT NOT NULL
+  - fecha_movimiento : TIMESTAMP NOT NULL
+  - id_usuario : INTEGER NULL
+  - observaciones : TEXT NULL
+
+### Table: merma (merma)
+  - id_merma : SERIAL NOT NULL
+  - id_movimiento : BIGINT NOT NULL
+  - motivo : VARCHAR(20) NOT NULL
+  - id_usuario_responsable : INTEGER NULL
+  - descripcion : TEXT NULL
+
+### Table: pedido_detalle_orden (pedido_detalle_orden)
+  - id_pedido_detalle_orden : SERIAL NOT NULL
+  - id_pedido_detalle : INTEGER NOT NULL
+  - id_orden_produccion : INTEGER NOT NULL
+
+### Table: venta (venta)
+  - id_venta : SERIAL NOT NULL
+  - id_pedido : INTEGER NOT NULL
+  - id_caja_sesion : INTEGER NOT NULL
+  - fecha_venta : TIMESTAMP NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+
+### Table: pago (pago)
+  - id_pago : SERIAL NOT NULL
+  - id_venta : INTEGER NOT NULL
+  - medio : VARCHAR(20) NOT NULL
+  - monto : NUMERIC(12,2) NOT NULL
+  - estado : VARCHAR(15) NOT NULL
+  - fecha_pago : TIMESTAMP NOT NULL
+
+### Table: costo_receta (costo_receta)
+  - id_costo_receta : SERIAL NOT NULL
+  - id_receta : INTEGER NOT NULL
+  - fecha_calculo : TIMESTAMP NOT NULL
+  - costo_total : NUMERIC(14,4) NOT NULL
+  - costo_porcion : NUMERIC(14,4) NOT NULL
+  - detalle_json : JSONB NULL
+
+### Table: gasto_operativo (gasto_operativo)
+  - id_gasto : SERIAL NOT NULL
+  - concepto : VARCHAR(120) NOT NULL
+  - categoria : VARCHAR(40) NULL
+  - monto : NUMERIC(12,2) NOT NULL
+  - fecha : DATE NOT NULL
+  - id_caja_sesion : INTEGER NULL
+
+### Table: movimiento_contable (movimiento_contable)
+  - id_movimiento_contable : BIGSERIAL NOT NULL
+  - tipo : VARCHAR(20) NOT NULL
+  - id_venta : INTEGER NULL
+  - id_costo_receta : INTEGER NULL
+  - id_gasto : INTEGER NULL
+  - monto : NUMERIC(14,2) NOT NULL
+  - signo : SMALLINT NOT NULL
+  - fecha : TIMESTAMP NOT NULL
+
+# REFERENCES / RELATIONSHIPS (50)
+  - fk_item_categoria : item -> categoria_item
+  - fk_item_unidad : item -> unidad_medida
+  - fk_ip_item : item_proveedor -> item
+  - fk_ip_proveedor : item_proveedor -> proveedor
+  - fk_ipres_item : item_presentacion -> item
+  - fk_ipres_unidad : item_presentacion -> unidad_medida
+  - fk_receta_item : receta -> item
+  - fk_receta_unidad : receta -> unidad_medida
+  - fk_oc_proveedor : orden_compra -> proveedor
+  - fk_reserva_cliente : reserva -> cliente
+  - fk_reserva_mesa : reserva -> mesa
+  - fk_pv_presentacion : precio_venta -> item_presentacion
+  - fk_rd_receta : receta_detalle -> receta
+  - fk_rd_insumo : receta_detalle -> item
+  - fk_rd_unidad : receta_detalle -> unidad_medida
+  - fk_ocd_orden : orden_compra_detalle -> orden_compra
+  - fk_ocd_item : orden_compra_detalle -> item
+  - fk_ocd_unidad : orden_compra_detalle -> unidad_medida
+  - fk_rdet_reserva : reserva_detalle -> reserva
+  - fk_rdet_item : reserva_detalle -> item
+  - fk_recepcion_orden : recepcion -> orden_compra
+  - fk_op_receta : orden_produccion -> receta
+  - fk_rd_recepcion : recepcion_detalle -> recepcion
+  - fk_rd_ocd : recepcion_detalle -> orden_compra_detalle
+  - fk_rd_unidad : recepcion_detalle -> unidad_medida
+  - fk_pd_pedido : pedido_detalle -> pedido
+  - fk_pd_presentacion : pedido_detalle -> item_presentacion
+  - fk_opd_orden : orden_produccion_detalle -> orden_produccion
+  - fk_opd_insumo : orden_produccion_detalle -> item
+  - fk_opd_unidad : orden_produccion_detalle -> unidad_medida
+  - fk_lote_item : lote_inventario -> item
+  - fk_lote_recepcion : lote_inventario -> recepcion_detalle
+  - fk_lote_unidad : lote_inventario -> unidad_medida
+  - fk_mov_item : movimiento_inventario -> item
+  - fk_mov_tipo : movimiento_inventario -> tipo_movimiento
+  - fk_mov_lote : movimiento_inventario -> lote_inventario
+  - fk_mov_unidad : movimiento_inventario -> unidad_medida
+  - fk_merma_movimiento : merma -> movimiento_inventario
+  - fk_pdo_detalle : pedido_detalle_orden -> pedido_detalle
+  - fk_pdo_orden : pedido_detalle_orden -> orden_produccion
+  - fk_venta_pedido : venta -> pedido
+  - fk_venta_caja : venta -> caja_sesion
+  - fk_pago_venta : pago -> venta
+  - fk_costo_receta : costo_receta -> receta
+  - fk_gasto_caja : gasto_operativo -> caja_sesion
+  - fk_mc_venta : movimiento_contable -> venta
+  - fk_mc_costo : movimiento_contable -> costo_receta
+  - fk_mc_gasto : movimiento_contable -> gasto_operativo
+  - fk_lote_orden_produccion : lote_inventario -> orden_produccion
+  - fk_pedido_reserva : pedido -> reserva
