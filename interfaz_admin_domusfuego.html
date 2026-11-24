@@ -19,8 +19,10 @@
             --color-gold: #DDA800;
             --color-gold-hover: #F2BD18;
             --color-white: #FFFFFF;
-            --color-text-muted: #A3A3A3;
+            --color-text-muted: #B8B8B8; /* Elevado para cumplir contraste WCAG AA */
+            --color-text-light: #E0E0E0;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
         }
 
         * {
@@ -30,34 +32,69 @@
             font-family: 'Montserrat', sans-serif;
         }
 
+        /* Enfoque accesible visible */
+        :focus-visible {
+            outline: 2px solid var(--color-gold);
+            outline-offset: 2px;
+        }
+
         body {
             background-color: var(--color-black);
             color: var(--color-white);
             display: flex;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
-        /* SIDEBAR */
+        /* BACKDROP PARA MÓVIL */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 150;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* SIDEBAR ACCESIBLE Y RESPONSIVO */
         .sidebar {
-            width: 280px;
+            width: var(--sidebar-width);
             background: linear-gradient(180deg, #121212 0%, #0A0A0A 100%);
             border-right: 1px solid var(--color-black-border);
             display: flex;
             flex-direction: column;
-            z-index: 100;
+            z-index: 200;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
         }
 
         .brand-header {
-            padding: 24px 20px;
+            padding: 22px 20px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            justify-content: space-between;
             border-bottom: 1px solid var(--color-black-border);
             background: rgba(150, 0, 0, 0.08);
         }
 
-        .brand-header i {
+        .brand-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-header i.brand-icon {
             font-size: 28px;
             color: var(--color-red-deep);
             filter: drop-shadow(0 0 10px rgba(184, 0, 0, 0.6));
@@ -65,7 +102,7 @@
 
         .brand-header h1 {
             font-family: 'Cinzel', serif;
-            font-size: 20px;
+            font-size: 19px;
             letter-spacing: 2px;
             font-weight: 800;
             color: var(--color-white);
@@ -73,6 +110,16 @@
 
         .brand-header span {
             color: var(--color-gold);
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--color-white);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px;
         }
 
         .nav-section-title {
@@ -104,11 +151,14 @@
         }
 
         .nav-link {
+            width: 100%;
             display: flex;
             align-items: center;
             gap: 14px;
             padding: 12px 16px;
             color: var(--color-text-muted);
+            background: transparent;
+            border: none;
             text-decoration: none;
             font-size: 13.5px;
             font-weight: 500;
@@ -116,6 +166,7 @@
             transition: var(--transition);
             border-left: 3px solid transparent;
             cursor: pointer;
+            text-align: left;
         }
 
         .nav-link i {
@@ -147,7 +198,7 @@
         }
 
         .user-profile-badge {
-            padding: 18px 20px;
+            padding: 16px 20px;
             border-top: 1px solid var(--color-black-border);
             display: flex;
             align-items: center;
@@ -166,6 +217,7 @@
             font-weight: 700;
             color: var(--color-white);
             border: 2px solid var(--color-gold);
+            flex-shrink: 0;
         }
 
         .user-info .name {
@@ -181,24 +233,53 @@
             font-weight: 600;
         }
 
-        /* MAIN CONTENT */
+        /* MAIN CONTAINER */
         .main-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             background: radial-gradient(circle at 90% 10%, rgba(150, 0, 0, 0.08) 0%, rgba(13, 13, 13, 1) 70%);
+            min-width: 0; /* Previene desbordamiento en flexbox */
         }
 
         .top-navbar {
-            height: 70px;
+            min-height: 70px;
             background: rgba(18, 18, 18, 0.85);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--color-black-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 32px;
+            padding: 12px 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: var(--color-black-elevated);
+            border: 1px solid var(--color-black-border);
+            color: var(--color-white);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .hamburger-btn:hover {
+            border-color: var(--color-gold);
+            color: var(--color-gold);
         }
 
         .breadcrumb {
@@ -217,7 +298,8 @@
         .top-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .search-box {
@@ -231,7 +313,7 @@
             padding: 8px 12px 8px 36px;
             font-size: 13px;
             color: var(--color-white);
-            width: 240px;
+            width: 220px;
             outline: none;
             transition: var(--transition);
         }
@@ -239,7 +321,7 @@
         .search-box input:focus {
             border-color: var(--color-gold);
             box-shadow: 0 0 10px rgba(221, 168, 0, 0.2);
-            width: 280px;
+            width: 250px;
         }
 
         .search-box i {
@@ -255,9 +337,9 @@
             background: linear-gradient(135deg, var(--color-gold) 0%, #B88A00 100%);
             color: var(--color-black);
             border: none;
-            padding: 9px 18px;
+            padding: 9px 16px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 700;
             letter-spacing: 0.5px;
             display: flex;
@@ -266,6 +348,7 @@
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 4px 15px rgba(221, 168, 0, 0.25);
+            white-space: nowrap;
         }
 
         .btn-gold:hover {
@@ -278,15 +361,16 @@
             background: linear-gradient(135deg, var(--color-red-deep) 0%, #700000 100%);
             color: var(--color-white);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 9px 18px;
+            padding: 9px 16px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .btn-red:hover {
@@ -296,7 +380,7 @@
         .content-scrollable {
             flex: 1;
             overflow-y: auto;
-            padding: 30px 32px;
+            padding: 24px 28px;
         }
 
         .content-scrollable::-webkit-scrollbar {
@@ -325,16 +409,16 @@
         /* METRICS ROW */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 20px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
         }
 
         .metric-card {
             background: var(--color-black-surface);
             border: 1px solid var(--color-black-border);
             border-radius: 10px;
-            padding: 20px;
+            padding: 18px;
             position: relative;
             overflow: hidden;
             transition: var(--transition);
@@ -361,7 +445,7 @@
         }
 
         .metric-title {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--color-text-muted);
             text-transform: uppercase;
             font-weight: 600;
@@ -378,7 +462,7 @@
         }
 
         .metric-value {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--color-white);
             margin-bottom: 4px;
@@ -395,7 +479,7 @@
             font-weight: 600;
         }
 
-        /* DATA TABLES */
+        /* DATA TABLES & WRAPPER RESPONSIVO */
         .table-card {
             background: var(--color-black-surface);
             border: 1px solid var(--color-black-border);
@@ -405,16 +489,18 @@
         }
 
         .card-header-bar {
-            padding: 18px 24px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--color-black-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #111111;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .card-header-bar h2 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--color-white);
             display: flex;
@@ -426,8 +512,24 @@
             color: var(--color-red-deep);
         }
 
+        /* CONTENEDOR CON SCROLL HORIZONTAL ASISTIDO */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 6px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: var(--color-black-border);
+            border-radius: 4px;
+        }
+
         .admin-table {
             width: 100%;
+            min-width: 650px; /* Previene colapso ilegible de columnas */
             border-collapse: collapse;
             text-align: left;
             font-size: 13px;
@@ -435,17 +537,18 @@
 
         .admin-table th {
             background: #171717;
-            padding: 14px 20px;
+            padding: 13px 18px;
             color: var(--color-gold);
             font-weight: 600;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--color-black-border);
+            white-space: nowrap;
         }
 
         .admin-table td {
-            padding: 14px 20px;
+            padding: 13px 18px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            color: #D6D6D6;
+            color: var(--color-text-light);
         }
 
         .admin-table tr:hover {
@@ -459,6 +562,7 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .status-pill.active, .status-pill.pagado, .status-pill.abierta {
@@ -483,25 +587,25 @@
         .audit-timeline {
             border-left: 2px solid var(--color-gold);
             margin-left: 10px;
-            padding-left: 24px;
+            padding-left: 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
         }
 
         .audit-item {
             position: relative;
             background: var(--color-black-surface);
             border: 1px solid var(--color-black-border);
-            padding: 18px 20px;
+            padding: 16px 18px;
             border-radius: 8px;
         }
 
         .audit-item::before {
             content: '';
             position: absolute;
-            left: -31px;
-            top: 22px;
+            left: -27px;
+            top: 20px;
             width: 12px;
             height: 12px;
             border-radius: 50%;
@@ -513,6 +617,8 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .audit-user {
@@ -542,6 +648,7 @@
             font-size: 11.5px;
             color: #B5B5B5;
             border: 1px solid var(--color-black-border);
+            overflow-x: auto;
         }
 
         /* ER DIAGRAM VIEWER */
@@ -549,76 +656,159 @@
             background: #080808;
             border: 1px solid var(--color-black-border);
             border-radius: 10px;
-            padding: 24px;
+            padding: 20px;
             overflow-x: auto;
+        }
+
+        /* ==========================================================================
+           MEDIA QUERIES (RESPONSIVIDAD REAL)
+           ========================================================================== */
+
+        /* Tablets y Pantallas Medianas (<= 992px) */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .hamburger-btn {
+                display: flex;
+            }
+
+            .close-sidebar-btn {
+                display: block;
+            }
+
+            .content-scrollable {
+                padding: 20px;
+            }
+        }
+
+        /* Móviles (<= 640px) */
+        @media (max-width: 640px) {
+            .top-navbar {
+                padding: 12px 16px;
+                gap: 12px;
+            }
+
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .search-box input:focus {
+                width: 100%;
+            }
+
+            .btn-gold, .btn-red {
+                flex: 1;
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-scrollable {
+                padding: 16px;
+            }
+
+            .brand-header h1 {
+                font-size: 17px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- OVERLAY OSCURO PARA MENÚ MÓVIL -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)" aria-hidden="true"></div>
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="mainSidebar" aria-label="Menú principal de navegación">
         <div class="brand-header">
-            <i class="fa-solid fa-fire-burner"></i>
-            <div>
-                <h1>DOMUS <span>FUEGO</span></h1>
-                <p style="font-size: 10px; color: var(--color-text-muted); letter-spacing: 1px;">SISTEMA ADMINISTRATIVO</p>
+            <div class="brand-title-wrap">
+                <i class="fa-solid fa-fire-burner brand-icon" aria-hidden="true"></i>
+                <div>
+                    <h1>DOMUS <span>FUEGO</span></h1>
+                    <p style="font-size: 10px; color: var(--color-text-muted); letter-spacing: 1px;">SISTEMA ADMINISTRATIVO</p>
+                </div>
             </div>
+            <button class="close-sidebar-btn" onclick="toggleSidebar(false)" aria-label="Cerrar menú lateral">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
-        <div class="nav-section-title">Módulos Administrativos</div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a class="nav-link active" onclick="switchTab('dashboard')">
-                    <i class="fa-solid fa-chart-line"></i> Resumen Ejecutivo
-                </a>
+        <div class="nav-section-title" id="navModulesHeading">Módulos Administrativos</div>
+        <ul class="nav-menu" role="tablist" aria-labelledby="navModulesHeading">
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="true" aria-controls="dashboard" class="nav-link active" onclick="switchTab('dashboard', this)">
+                    <i class="fa-solid fa-chart-line" aria-hidden="true"></i> Resumen Ejecutivo
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('inventario')">
-                    <i class="fa-solid fa-boxes-stacked"></i> Catálogo e Items
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="inventario" class="nav-link" onclick="switchTab('inventario', this)">
+                    <i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i> Catálogo e Items
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('compras')">
-                    <i class="fa-solid fa-truck-ramp-box"></i> Compras & Proveedores
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="compras" class="nav-link" onclick="switchTab('compras', this)">
+                    <i class="fa-solid fa-truck-ramp-box" aria-hidden="true"></i> Compras & Proveedores
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('produccion')">
-                    <i class="fa-solid fa-kitchen-set"></i> Producción & Recetas
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="produccion" class="nav-link" onclick="switchTab('produccion', this)">
+                    <i class="fa-solid fa-kitchen-set" aria-hidden="true"></i> Producción & Recetas
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('sala')">
-                    <i class="fa-solid fa-chair"></i> Mesas & Reservas
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="sala" class="nav-link" onclick="switchTab('sala', this)">
+                    <i class="fa-solid fa-chair" aria-hidden="true"></i> Mesas & Reservas
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('ventas')">
-                    <i class="fa-solid fa-cash-register"></i> Pedidos, Ventas & Caja
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="ventas" class="nav-link" onclick="switchTab('ventas', this)">
+                    <i class="fa-solid fa-cash-register" aria-hidden="true"></i> Pedidos, Ventas & Caja
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('contabilidad')">
-                    <i class="fa-solid fa-scale-balanced"></i> Finanzas & Gastos
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="contabilidad" class="nav-link" onclick="switchTab('contabilidad', this)">
+                    <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i> Finanzas & Gastos
+                </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('er_model')">
-                    <i class="fa-solid fa-project-diagram"></i> Modelo Entidad-Relación
-                </a>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="er_model" class="nav-link" onclick="switchTab('er_model', this)">
+                    <i class="fa-solid fa-project-diagram" aria-hidden="true"></i> Modelo Entidad-Relación
+                </button>
             </li>
 
-            <div class="nav-section-title" style="margin-top: 15px;">Seguridad & Control</div>
-            <li class="nav-item">
-                <a class="nav-link audit-special" onclick="switchTab('auditoria')">
-                    <i class="fa-solid fa-shield-halved" style="color: var(--color-gold);"></i> Auditoría & Bitácora
-                </a>
+            <div class="nav-section-title" id="navSecurityHeading" style="margin-top: 15px;">Seguridad & Control</div>
+            <li class="nav-item" role="presentation">
+                <button role="tab" aria-selected="false" aria-controls="auditoria" class="nav-link audit-special" onclick="switchTab('auditoria', this)">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--color-gold);" aria-hidden="true"></i> Auditoría & Bitácora
+                </button>
             </li>
         </ul>
 
         <div class="user-profile-badge">
-            <div class="avatar">AD</div>
+            <div class="avatar" aria-label="Avatar Administrador">AD</div>
             <div class="user-info">
                 <div class="name">Gerencia General</div>
                 <div class="role">Admin Principal</div>
@@ -630,21 +820,27 @@
     <main class="main-container">
         <!-- TOPBAR -->
         <header class="top-navbar">
-            <div class="breadcrumb">
-                <span>DOMUS FUEGO</span>
-                <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
-                <span class="current" id="moduleBreadcrumb">Resumen Ejecutivo</span>
+            <div class="navbar-left">
+                <button class="hamburger-btn" onclick="toggleSidebar(true)" aria-label="Abrir menú de navegación">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <nav class="breadcrumb" aria-label="Ubicación de página">
+                    <span>DOMUS FUEGO</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 10px;" aria-hidden="true"></i>
+                    <span class="current" id="moduleBreadcrumb" aria-current="page">Resumen Ejecutivo</span>
+                </nav>
             </div>
+
             <div class="top-actions">
                 <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Buscar transacción, lote o item...">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="text" placeholder="Buscar transacción o item..." aria-label="Buscar en el sistema">
                 </div>
                 <button class="btn-red" onclick="alert('Generando Reporte Diario PDF...')">
-                    <i class="fa-solid fa-file-pdf"></i> Exportar
+                    <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> Exportar
                 </button>
                 <button class="btn-gold" onclick="alert('Acción administrativa autorizada')">
-                    <i class="fa-solid fa-plus"></i> Nueva Operación
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Nueva Operación
                 </button>
             </div>
         </header>
@@ -653,25 +849,25 @@
         <div class="content-scrollable">
 
             <!-- 1. DASHBOARD -->
-            <section id="dashboard" class="module-view active">
+            <section id="dashboard" class="module-view active" role="tabpanel" aria-labelledby="tab-dashboard">
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-title">Ventas Hoy <i class="fa-solid fa-receipt"></i></div>
+                        <div class="metric-title">Ventas Hoy <i class="fa-solid fa-receipt" aria-hidden="true"></i></div>
                         <div class="metric-value">$4,285.50</div>
                         <div class="metric-sub"><span class="positive">+14.2%</span> vs ayer</div>
                     </div>
                     <div class="metric-card accent-gold">
-                        <div class="metric-title">Caja Sesión Actual <i class="fa-solid fa-vault"></i></div>
+                        <div class="metric-title">Caja Sesión Actual <i class="fa-solid fa-vault" aria-hidden="true"></i></div>
                         <div class="metric-value">$1,850.00</div>
                         <div class="metric-sub">Turno Almuerzo (Abierta)</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-title">Órdenes Producción <i class="fa-solid fa-fire"></i></div>
+                        <div class="metric-title">Órdenes Producción <i class="fa-solid fa-fire" aria-hidden="true"></i></div>
                         <div class="metric-value">18 Activas</div>
                         <div class="metric-sub">Cortes Premium & Asador</div>
                     </div>
                     <div class="metric-card accent-gold">
-                        <div class="metric-title">Ocupación de Mesas <i class="fa-solid fa-users"></i></div>
+                        <div class="metric-title">Ocupación de Mesas <i class="fa-solid fa-users" aria-hidden="true"></i></div>
                         <div class="metric-value">85%</div>
                         <div class="metric-sub">12 Reservas confirmadas</div>
                     </div>
@@ -679,60 +875,62 @@
 
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-clock-rotate-left"></i> Últimos Movimientos Administrativos</h2>
+                        <h2><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Últimos Movimientos Administrativos</h2>
                         <span style="font-size: 12px; color: var(--color-gold);">Actualizado en tiempo real</span>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID Transacción</th>
-                                <th>Módulo</th>
-                                <th>Descripción</th>
-                                <th>Monto / Cantidad</th>
-                                <th>Fecha/Hora</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>#VTA-1049</td>
-                                <td>Ventas</td>
-                                <td>Mesa 4 - Consumo Tomahawk Steakhouse</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$185.00</td>
-                                <td>Hace 8 min</td>
-                                <td><span class="status-pill pagado">Pagado</span></td>
-                            </tr>
-                            <tr>
-                                <td>#OP-204</td>
-                                <td>Producción</td>
-                                <td>Corte y Maduración Bife de Chorizo (Lote #L-981)</td>
-                                <td>24.50 Kg</td>
-                                <td>Hace 25 min</td>
-                                <td><span class="status-pill active">En Proceso</span></td>
-                            </tr>
-                            <tr>
-                                <td>#OC-092</td>
-                                <td>Compras</td>
-                                <td>Recepción Carnes Andinas S.A.</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$1,420.00</td>
-                                <td>Hace 1 hora</td>
-                                <td><span class="status-pill active">Recibido</span></td>
-                            </tr>
-                            <tr>
-                                <td>#GST-041</td>
-                                <td>Finanzas</td>
-                                <td>Compra carbón de quebracho blanco</td>
-                                <td style="color: #FF5E5E; font-weight: 700;">-$85.00</td>
-                                <td>Hace 2 horas</td>
-                                <td><span class="status-pill cerrada">Liquidado</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID Transacción</th>
+                                    <th scope="col">Módulo</th>
+                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Monto / Cantidad</th>
+                                    <th scope="col">Fecha/Hora</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#VTA-1049</td>
+                                    <td>Ventas</td>
+                                    <td>Mesa 4 - Consumo Tomahawk Steakhouse</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$185.00</td>
+                                    <td>Hace 8 min</td>
+                                    <td><span class="status-pill pagado">Pagado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#OP-204</td>
+                                    <td>Producción</td>
+                                    <td>Corte y Maduración Bife de Chorizo (Lote #L-981)</td>
+                                    <td>24.50 Kg</td>
+                                    <td>Hace 25 min</td>
+                                    <td><span class="status-pill active">En Proceso</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#OC-092</td>
+                                    <td>Compras</td>
+                                    <td>Recepción Carnes Andinas S.A.</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$1,420.00</td>
+                                    <td>Hace 1 hora</td>
+                                    <td><span class="status-pill active">Recibido</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#GST-041</td>
+                                    <td>Finanzas</td>
+                                    <td>Compra carbón de quebracho blanco</td>
+                                    <td style="color: #FF5E5E; font-weight: 700;">-$85.00</td>
+                                    <td>Hace 2 horas</td>
+                                    <td><span class="status-pill cerrada">Liquidado</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 2. INVENTARIO & ITEMS -->
-            <section id="inventario" class="module-view">
+            <section id="inventario" class="module-view" role="tabpanel">
                 <div class="metrics-grid">
                     <div class="metric-card accent-gold">
                         <div class="metric-title">Total Items Registrados</div>
@@ -753,160 +951,166 @@
 
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-list-check"></i> Catálogo de Insumos y Productos (item, categoria_item, lote_inventario)</h2>
-                        <button class="btn-gold" style="font-size: 11px; padding: 6px 12px;"><i class="fa-solid fa-plus"></i> Nuevo Item</button>
+                        <h2><i class="fa-solid fa-list-check" aria-hidden="true"></i> Catálogo de Insumos y Productos (item, categoria_item, lote_inventario)</h2>
+                        <button class="btn-gold" style="font-size: 11px; padding: 6px 12px;"><i class="fa-solid fa-plus" aria-hidden="true"></i> Nuevo Item</button>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>Unidad Base</th>
-                                <th>Política Consumo</th>
-                                <th>Stock Actual</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>ITEM-001</td>
-                                <td>Ojo de Bife Angus Premium</td>
-                                <td>Carnes y Asador</td>
-                                <td>Kilogramo (Kg)</td>
-                                <td>FEFO (Vencimiento)</td>
-                                <td>42.50 Kg</td>
-                                <td><span class="status-pill active">Disponible</span></td>
-                            </tr>
-                            <tr>
-                                <td>ITEM-002</td>
-                                <td>Carbón Vegetal de Quebracho</td>
-                                <td>Combustibles & Fuego</td>
-                                <td>Kilogramo (Kg)</td>
-                                <td>FIFO</td>
-                                <td>180.00 Kg</td>
-                                <td><span class="status-pill active">Disponible</span></td>
-                            </tr>
-                            <tr>
-                                <td>ITEM-003</td>
-                                <td>Vino Malbec Gran Reserva</td>
-                                <td>Cava y Bebidas</td>
-                                <td>Botella (750ml)</td>
-                                <td>FIFO</td>
-                                <td>38 Unidades</td>
-                                <td><span class="status-pill active">Disponible</span></td>
-                            </tr>
-                            <tr>
-                                <td>ITEM-004</td>
-                                <td>Sal de Mar Ahumada</td>
-                                <td>Especias y Condimentos</td>
-                                <td>Kilogramo (Kg)</td>
-                                <td>FIFO</td>
-                                <td>3.20 Kg</td>
-                                <td><span class="status-pill pending">Stock Mínimo</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Código</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Categoría</th>
+                                    <th scope="col">Unidad Base</th>
+                                    <th scope="col">Política Consumo</th>
+                                    <th scope="col">Stock Actual</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ITEM-001</td>
+                                    <td>Ojo de Bife Angus Premium</td>
+                                    <td>Carnes y Asador</td>
+                                    <td>Kilogramo (Kg)</td>
+                                    <td>FEFO (Vencimiento)</td>
+                                    <td>42.50 Kg</td>
+                                    <td><span class="status-pill active">Disponible</span></td>
+                                </tr>
+                                <tr>
+                                    <td>ITEM-002</td>
+                                    <td>Carbón Vegetal de Quebracho</td>
+                                    <td>Combustibles & Fuego</td>
+                                    <td>Kilogramo (Kg)</td>
+                                    <td>FIFO</td>
+                                    <td>180.00 Kg</td>
+                                    <td><span class="status-pill active">Disponible</span></td>
+                                </tr>
+                                <tr>
+                                    <td>ITEM-003</td>
+                                    <td>Vino Malbec Gran Reserva</td>
+                                    <td>Cava y Bebidas</td>
+                                    <td>Botella (750ml)</td>
+                                    <td>FIFO</td>
+                                    <td>38 Unidades</td>
+                                    <td><span class="status-pill active">Disponible</span></td>
+                                </tr>
+                                <tr>
+                                    <td>ITEM-004</td>
+                                    <td>Sal de Mar Ahumada</td>
+                                    <td>Especias y Condimentos</td>
+                                    <td>Kilogramo (Kg)</td>
+                                    <td>FIFO</td>
+                                    <td>3.20 Kg</td>
+                                    <td><span class="status-pill pending">Stock Mínimo</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 3. COMPRAS & PROVEEDORES -->
-            <section id="compras" class="module-view">
+            <section id="compras" class="module-view" role="tabpanel">
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-truck"></i> Gestión de Proveedores y Órdenes de Compra (proveedor, orden_compra, recepcion)</h2>
-                        <button class="btn-gold" style="font-size: 11px; padding: 6px 12px;"><i class="fa-solid fa-plus"></i> Nueva Orden</button>
+                        <h2><i class="fa-solid fa-truck" aria-hidden="true"></i> Gestión de Proveedores y Órdenes de Compra (proveedor, orden_compra, recepcion)</h2>
+                        <button class="btn-gold" style="font-size: 11px; padding: 6px 12px;"><i class="fa-solid fa-plus" aria-hidden="true"></i> Nueva Orden</button>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Orden #</th>
-                                <th>Proveedor</th>
-                                <th>Fecha Emisión</th>
-                                <th>Estado OC</th>
-                                <th>Recepción Almacén</th>
-                                <th>Total Factura</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>OC-2026-0089</td>
-                                <td>Frigorífico El Gaucho Cía. Ltda.</td>
-                                <td>2026-11-04</td>
-                                <td><span class="status-pill active">Completada</span></td>
-                                <td>REC-0089 (Conforme)</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$2,450.00</td>
-                            </tr>
-                            <tr>
-                                <td>OC-2026-0090</td>
-                                <td>Distribuidora de Carbón y Leña del Valle</td>
-                                <td>2026-11-05</td>
-                                <td><span class="status-pill pending">En Tránsito</span></td>
-                                <td>Pendiente</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$480.00</td>
-                            </tr>
-                            <tr>
-                                <td>OC-2026-0091</td>
-                                <td>Bodegas & Cavas del Cono Sur</td>
-                                <td>2026-11-06</td>
-                                <td><span class="status-pill pending">Aprobada</span></td>
-                                <td>Pendiente</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$1,120.00</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Orden #</th>
+                                    <th scope="col">Proveedor</th>
+                                    <th scope="col">Fecha Emisión</th>
+                                    <th scope="col">Estado OC</th>
+                                    <th scope="col">Recepción Almacén</th>
+                                    <th scope="col">Total Factura</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>OC-2026-0089</td>
+                                    <td>Frigorífico El Gaucho Cía. Ltda.</td>
+                                    <td>2026-11-04</td>
+                                    <td><span class="status-pill active">Completada</span></td>
+                                    <td>REC-0089 (Conforme)</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$2,450.00</td>
+                                </tr>
+                                <tr>
+                                    <td>OC-2026-0090</td>
+                                    <td>Distribuidora de Carbón y Leña del Valle</td>
+                                    <td>2026-11-05</td>
+                                    <td><span class="status-pill pending">En Tránsito</span></td>
+                                    <td>Pendiente</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$480.00</td>
+                                </tr>
+                                <tr>
+                                    <td>OC-2026-0091</td>
+                                    <td>Bodegas & Cavas del Cono Sur</td>
+                                    <td>2026-11-06</td>
+                                    <td><span class="status-pill pending">Aprobada</span></td>
+                                    <td>Pendiente</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$1,120.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 4. PRODUCCION & RECETAS -->
-            <section id="produccion" class="module-view">
+            <section id="produccion" class="module-view" role="tabpanel">
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-fire-flame-curved"></i> Recetas y Órdenes de Producción (receta, orden_produccion, merma)</h2>
+                        <h2><i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i> Recetas y Órdenes de Producción (receta, orden_produccion, merma)</h2>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Receta</th>
-                                <th>Rendimiento</th>
-                                <th>Costo Porción</th>
-                                <th>Merma Est.</th>
-                                <th>Última Ejecución</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Bife de Chorizo Madurado 400g</td>
-                                <td>1 Porción</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$9.45</td>
-                                <td>8.5%</td>
-                                <td>Hoy 11:30</td>
-                                <td><span class="status-pill active">Activa</span></td>
-                            </tr>
-                            <tr>
-                                <td>Tomahawk a la Parrilla 1.2Kg</td>
-                                <td>1 Porción Compartida</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$22.80</td>
-                                <td>12.0%</td>
-                                <td>Hoy 12:15</td>
-                                <td><span class="status-pill active">Activa</span></td>
-                            </tr>
-                            <tr>
-                                <td>Costillar Ahumado en Leña de Roble</td>
-                                <td>4 Porciones</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$16.20</td>
-                                <td>15.0%</td>
-                                <td>Ayer 18:00</td>
-                                <td><span class="status-pill active">Activa</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Receta</th>
+                                    <th scope="col">Rendimiento</th>
+                                    <th scope="col">Costo Porción</th>
+                                    <th scope="col">Merma Est.</th>
+                                    <th scope="col">Última Ejecución</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bife de Chorizo Madurado 400g</td>
+                                    <td>1 Porción</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$9.45</td>
+                                    <td>8.5%</td>
+                                    <td>Hoy 11:30</td>
+                                    <td><span class="status-pill active">Activa</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Tomahawk a la Parrilla 1.2Kg</td>
+                                    <td>1 Porción Compartida</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$22.80</td>
+                                    <td>12.0%</td>
+                                    <td>Hoy 12:15</td>
+                                    <td><span class="status-pill active">Activa</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Costillar Ahumado en Leña de Roble</td>
+                                    <td>4 Porciones</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$16.20</td>
+                                    <td>15.0%</td>
+                                    <td>Ayer 18:00</td>
+                                    <td><span class="status-pill active">Activa</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 5. SALA & RESERVAS -->
-            <section id="sala" class="module-view">
+            <section id="sala" class="module-view" role="tabpanel">
                 <div class="metrics-grid">
                     <div class="metric-card accent-gold">
                         <div class="metric-title">Mesas Totales</div>
@@ -927,149 +1131,155 @@
 
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-calendar-check"></i> Registro de Reservas (reserva, cliente, mesa)</h2>
+                        <h2><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Registro de Reservas (reserva, cliente, mesa)</h2>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Reserva #</th>
-                                <th>Cliente</th>
-                                <th>Mesa</th>
-                                <th>Comensales</th>
-                                <th>Fecha & Hora</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>RES-104</td>
-                                <td>Ing. Carlos Montalvo</td>
-                                <td>Mesa VIP 2</td>
-                                <td>6 personas</td>
-                                <td>Hoy 20:30</td>
-                                <td><span class="status-pill pagado">Confirmada</span></td>
-                            </tr>
-                            <tr>
-                                <td>RES-105</td>
-                                <td>Dra. Andrea Salgado</td>
-                                <td>Mesa Terraza 8</td>
-                                <td>4 personas</td>
-                                <td>Hoy 21:00</td>
-                                <td><span class="status-pill pending">Pendiente Arribo</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Reserva #</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Mesa</th>
+                                    <th scope="col">Comensales</th>
+                                    <th scope="col">Fecha & Hora</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>RES-104</td>
+                                    <td>Ing. Carlos Montalvo</td>
+                                    <td>Mesa VIP 2</td>
+                                    <td>6 personas</td>
+                                    <td>Hoy 20:30</td>
+                                    <td><span class="status-pill pagado">Confirmada</span></td>
+                                </tr>
+                                <tr>
+                                    <td>RES-105</td>
+                                    <td>Dra. Andrea Salgado</td>
+                                    <td>Mesa Terraza 8</td>
+                                    <td>4 personas</td>
+                                    <td>Hoy 21:00</td>
+                                    <td><span class="status-pill pending">Pendiente Arribo</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 6. VENTAS & CAJA -->
-            <section id="ventas" class="module-view">
+            <section id="ventas" class="module-view" role="tabpanel">
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-money-bill-transfer"></i> Control de Sesión de Caja y Ventas (caja_sesion, venta, pago)</h2>
+                        <h2><i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i> Control de Sesión de Caja y Ventas (caja_sesion, venta, pago)</h2>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Factura Venta</th>
-                                <th>Sesión Caja</th>
-                                <th>Medio de Pago</th>
-                                <th>Monto Total</th>
-                                <th>Fecha & Hora</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>VTA-00891</td>
-                                <td>Caja #1 (Apertura $300)</td>
-                                <td>Tarjeta de Crédito</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$145.20</td>
-                                <td>14:10:15</td>
-                                <td><span class="status-pill pagado">Completado</span></td>
-                            </tr>
-                            <tr>
-                                <td>VTA-00892</td>
-                                <td>Caja #1 (Apertura $300)</td>
-                                <td>Efectivo USD</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$84.00</td>
-                                <td>14:25:40</td>
-                                <td><span class="status-pill pagado">Completado</span></td>
-                            </tr>
-                            <tr>
-                                <td>VTA-00893</td>
-                                <td>Caja #1 (Apertura $300)</td>
-                                <td>Transferencia</td>
-                                <td style="color: var(--color-gold); font-weight: 700;">$210.50</td>
-                                <td>14:38:00</td>
-                                <td><span class="status-pill pagado">Completado</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Factura Venta</th>
+                                    <th scope="col">Sesión Caja</th>
+                                    <th scope="col">Medio de Pago</th>
+                                    <th scope="col">Monto Total</th>
+                                    <th scope="col">Fecha & Hora</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>VTA-00891</td>
+                                    <td>Caja #1 (Apertura $300)</td>
+                                    <td>Tarjeta de Crédito</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$145.20</td>
+                                    <td>14:10:15</td>
+                                    <td><span class="status-pill pagado">Completado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>VTA-00892</td>
+                                    <td>Caja #1 (Apertura $300)</td>
+                                    <td>Efectivo USD</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$84.00</td>
+                                    <td>14:25:40</td>
+                                    <td><span class="status-pill pagado">Completado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>VTA-00893</td>
+                                    <td>Caja #1 (Apertura $300)</td>
+                                    <td>Transferencia</td>
+                                    <td style="color: var(--color-gold); font-weight: 700;">$210.50</td>
+                                    <td>14:38:00</td>
+                                    <td><span class="status-pill pagado">Completado</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 7. FINANZAS & CONTABILIDAD -->
-            <section id="contabilidad" class="module-view">
+            <section id="contabilidad" class="module-view" role="tabpanel">
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-calculator"></i> Libro Contable y Gastos Operativos (movimiento_contable, gasto_operativo)</h2>
+                        <h2><i class="fa-solid fa-calculator" aria-hidden="true"></i> Libro Contable y Gastos Operativos (movimiento_contable, gasto_operativo)</h2>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Asiento #</th>
-                                <th>Tipo Operación</th>
-                                <th>Concepto / Referencia</th>
-                                <th>Signo</th>
-                                <th>Monto Contable</th>
-                                <th>Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>AST-8921</td>
-                                <td>Ingreso por Venta</td>
-                                <td>Liquidación Comandas Turno Mañana</td>
-                                <td>+1 (Haber)</td>
-                                <td style="color: #2ECC71; font-weight: 700;">+$2,850.00</td>
-                                <td>2026-11-06</td>
-                            </tr>
-                            <tr>
-                                <td>AST-8922</td>
-                                <td>Costo de Receta</td>
-                                <td>Salida de Lotes Carnes Asadas</td>
-                                <td>-1 (Debe)</td>
-                                <td style="color: #FF5E5E; font-weight: 700;">-$920.40</td>
-                                <td>2026-11-06</td>
-                            </tr>
-                            <tr>
-                                <td>AST-8923</td>
-                                <td>Gasto Operativo</td>
-                                <td>Mantenimiento de Extractores y Campanas</td>
-                                <td>-1 (Debe)</td>
-                                <td style="color: #FF5E5E; font-weight: 700;">-$150.00</td>
-                                <td>2026-11-06</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Asiento #</th>
+                                    <th scope="col">Tipo Operación</th>
+                                    <th scope="col">Concepto / Referencia</th>
+                                    <th scope="col">Signo</th>
+                                    <th scope="col">Monto Contable</th>
+                                    <th scope="col">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>AST-8921</td>
+                                    <td>Ingreso por Venta</td>
+                                    <td>Liquidación Comandas Turno Mañana</td>
+                                    <td>+1 (Haber)</td>
+                                    <td style="color: #2ECC71; font-weight: 700;">+$2,850.00</td>
+                                    <td>2026-11-06</td>
+                                </tr>
+                                <tr>
+                                    <td>AST-8922</td>
+                                    <td>Costo de Receta</td>
+                                    <td>Salida de Lotes Carnes Asadas</td>
+                                    <td>-1 (Debe)</td>
+                                    <td style="color: #FF5E5E; font-weight: 700;">-$920.40</td>
+                                    <td>2026-11-06</td>
+                                </tr>
+                                <tr>
+                                    <td>AST-8923</td>
+                                    <td>Gasto Operativo</td>
+                                    <td>Mantenimiento de Extractores y Campanas</td>
+                                    <td>-1 (Debe)</td>
+                                    <td style="color: #FF5E5E; font-weight: 700;">-$150.00</td>
+                                    <td>2026-11-06</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- 8. MODELO ENTIDAD-RELACIÓN -->
-            <section id="er_model" class="module-view">
+            <section id="er_model" class="module-view" role="tabpanel">
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-network-wired"></i> Arquitectura Entidad-Relación (32 Tablas, 50 Foreign Keys)</h2>
+                        <h2><i class="fa-solid fa-network-wired" aria-hidden="true"></i> Arquitectura Entidad-Relación (32 Tablas, 50 Foreign Keys)</h2>
                         <a href="file:///c:/Users/Jeremy/Desktop/PUCE/5toS/DesarrolloDePlataformas/DOMUSFUEGO/Scripts/Script-Creacion-Tablas-Constrains-DomusFuego.sql" target="_blank" class="btn-gold" style="font-size: 11px; padding: 6px 12px; text-decoration: none;">
-                            <i class="fa-solid fa-code"></i> Ver Script DDL Completo
+                            <i class="fa-solid fa-code" aria-hidden="true"></i> Ver Script DDL Completo
                         </a>
                     </div>
                     <div class="er-diagram-container">
                         <div style="margin-bottom: 15px; color: var(--color-gold); font-size: 13px; font-weight: 600;">
                             Esquema de Agrupación por Clusters Funcionales:
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
                             <div style="background: #141414; padding: 16px; border-radius: 8px; border-left: 3px solid var(--color-gold);">
                                 <h3 style="color: var(--color-gold); font-size: 14px; margin-bottom: 8px;">1. Maestro & Items</h3>
                                 <p style="font-size: 12px; color: #BBB;">`unidad_medida` &rarr; `categoria_item` &rarr; `item` &rarr; `item_presentacion` &rarr; `precio_venta`</p>
@@ -1096,7 +1306,7 @@
             </section>
 
             <!-- 9. AUDITORIA & BITACORA -->
-            <section id="auditoria" class="module-view">
+            <section id="auditoria" class="module-view" role="tabpanel">
                 <div class="metrics-grid">
                     <div class="metric-card accent-gold">
                         <div class="metric-title">Modelo Auditor Activo</div>
@@ -1117,14 +1327,14 @@
 
                 <div class="table-card">
                     <div class="card-header-bar">
-                        <h2><i class="fa-solid fa-shield-halved"></i> Bitácora de Auditoría Independiente (AUDIT.md)</h2>
-                        <span class="status-pill active"><i class="fa-solid fa-lock"></i> Entorno Protegido</span>
+                        <h2><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Bitácora de Auditoría Independiente (AUDIT.md)</h2>
+                        <span class="status-pill active"><i class="fa-solid fa-lock" aria-hidden="true"></i> Entorno Protegido</span>
                     </div>
-                    <div style="padding: 24px;">
+                    <div style="padding: 20px;">
                         <div class="audit-timeline">
                             <div class="audit-item">
                                 <div class="audit-header">
-                                    <div class="audit-user"><i class="fa-solid fa-robot" style="color: var(--color-gold);"></i> Auditor IA - Revisión de Modelo de Datos</div>
+                                    <div class="audit-user"><i class="fa-solid fa-robot" style="color: var(--color-gold);" aria-hidden="true"></i> Auditor IA - Revisión de Modelo de Datos</div>
                                     <div class="audit-time">2026-11-06 | Verificado</div>
                                 </div>
                                 <div class="audit-action">
@@ -1140,7 +1350,7 @@
 
                             <div class="audit-item">
                                 <div class="audit-header">
-                                    <div class="audit-user"><i class="fa-solid fa-user-shield" style="color: var(--color-red-deep);"></i> Sistema de Control Interno</div>
+                                    <div class="audit-user"><i class="fa-solid fa-user-shield" style="color: var(--color-red-deep);" aria-hidden="true"></i> Sistema de Control Interno</div>
                                     <div class="audit-time">2026-11-06 09:30:00</div>
                                 </div>
                                 <div class="audit-action">
@@ -1171,25 +1381,53 @@
             'auditoria': 'Seguridad: Auditoría & Bitácora'
         };
 
-        function switchTab(moduleKey) {
-            // Ocultar todas las vistas
-            document.querySelectorAll('.module-view').forEach(el => el.classList.remove('active'));
-            // Remover clase activa del menu
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        function toggleSidebar(open) {
+            const sidebar = document.getElementById('mainSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (open) {
+                sidebar.classList.add('open');
+                backdrop.classList.add('active');
+            } else {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('active');
+            }
+        }
 
-            // Activar la vista seleccionada
+        function switchTab(moduleKey, triggerBtn) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.module-view').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Desmarcar todos los botones y actualizar ARIA
+            document.querySelectorAll('.nav-link').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+
+            // Activar la vista objetivo
             const target = document.getElementById(moduleKey);
             if (target) {
                 target.classList.add('active');
             }
 
             // Actualizar breadcrumb
-            document.getElementById('moduleBreadcrumb').textContent = titles[moduleKey] || 'Módulo Administrativo';
+            const bc = document.getElementById('moduleBreadcrumb');
+            if (bc) {
+                bc.textContent = titles[moduleKey] || 'Módulo Administrativo';
+            }
 
-            // Activar el link correspondiente
-            event.currentTarget.classList.add('active');
+            // Activar el botón correspondiente
+            if (triggerBtn) {
+                triggerBtn.classList.add('active');
+                triggerBtn.setAttribute('aria-selected', 'true');
+            }
+
+            // Si está en pantalla móvil/tablet, cerrar sidebar automáticamente tras selección
+            if (window.innerWidth <= 992) {
+                toggleSidebar(false);
+            }
         }
     </script>
 </body>
 </html>
-
